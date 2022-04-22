@@ -1197,6 +1197,90 @@ export class OpenSeaPort {
     return transactionHash;
   }
 
+  public async fulfillOrder_({
+    order,
+    accountAddress,
+    recipientAddress,
+  }: {
+    order: Order;
+    accountAddress: string;
+    recipientAddress?: string;
+    referrerAddress?: string;
+  }): Promise<any> {
+    const matchingOrder = this._makeMatchingOrder({
+      order,
+      accountAddress,
+      recipientAddress: recipientAddress || accountAddress,
+    });
+
+    const { buy, sell } = assignOrdersToSides(order, matchingOrder);
+    const value = await this._getRequiredAmountForTakingSellOrder(sell);
+
+    const args: WyvernAtomicMatchParameters = [
+      [
+        buy.exchange,
+        buy.maker,
+        buy.taker,
+        buy.feeRecipient,
+        buy.target,
+        buy.staticTarget,
+        buy.paymentToken,
+        sell.exchange,
+        sell.maker,
+        sell.taker,
+        sell.feeRecipient,
+        sell.target,
+        sell.staticTarget,
+        sell.paymentToken,
+      ],
+      [
+        buy.makerRelayerFee,
+        buy.takerRelayerFee,
+        buy.makerProtocolFee,
+        buy.takerProtocolFee,
+        buy.basePrice,
+        buy.extra,
+        buy.listingTime,
+        buy.expirationTime,
+        buy.salt,
+        sell.makerRelayerFee,
+        sell.takerRelayerFee,
+        sell.makerProtocolFee,
+        sell.takerProtocolFee,
+        sell.basePrice,
+        sell.extra,
+        sell.listingTime,
+        sell.expirationTime,
+        sell.salt,
+      ],
+      [
+        buy.feeMethod,
+        buy.side,
+        buy.saleKind,
+        buy.howToCall,
+        sell.feeMethod,
+        sell.side,
+        sell.saleKind,
+        sell.howToCall,
+      ],
+      buy.calldata,
+      sell.calldata,
+      buy.replacementPattern,
+      sell.replacementPattern,
+      buy.staticExtradata,
+      sell.staticExtradata,
+      [buy.v || 0, sell.v || 0],
+      [
+        buy.r || NULL_BLOCK_HASH,
+        buy.s || NULL_BLOCK_HASH,
+        sell.r || NULL_BLOCK_HASH,
+        sell.s || NULL_BLOCK_HASH,
+        NULL_BLOCK_HASH,
+      ],
+    ];
+    return { args, value };
+  }
+
   /**
    * Cancel an order on-chain, preventing it from ever being fulfilled.
    * @param param0 __namedParameters Object
