@@ -2,9 +2,15 @@
 import { OpenSeaAPI } from "./api";
 import { OpenSeaPort } from "./seaport";
 import { Network, EventData, EventType } from "./types";
-export { orderToJSON, orderFromJSON, WyvernProtocol } from "./utils/utils";
+export {
+  orderToJSON,
+  orderFromJSON,
+  merkleValidatorByNetwork,
+  WyvernProtocol,
+} from "./utils/utils";
 export {
   encodeCall,
+  encodeBuy,
   encodeSell,
   encodeAtomicizedBuy,
   encodeAtomicizedSell,
