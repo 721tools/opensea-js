@@ -1214,7 +1214,6 @@ export class OpenSeaPort {
     });
 
     const { buy, sell } = assignOrdersToSides(order, matchingOrder);
-    const value = await this._getRequiredAmountForTakingSellOrder(sell);
 
     const args: WyvernAtomicMatchParameters = [
       [
@@ -1278,7 +1277,7 @@ export class OpenSeaPort {
         NULL_BLOCK_HASH,
       ],
     ];
-    return { args, value };
+    return { args };
   }
 
   /**
